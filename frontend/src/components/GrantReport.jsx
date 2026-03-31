@@ -34,10 +34,22 @@ function GrantReport() {
     fetchProjects(cleared);
   }
 
+  // Statistics calculated from filtered results
+  const total = projects.length;
+  const avgBudget = total > 0
+    ? (projects.reduce((s, p) => s + (p.budget || 0), 0) / total).toFixed(2)
+    : '0.00';
+  const avgResearchers = total > 0
+    ? (projects.reduce((s, p) => s + p.researchers.length, 0) / total).toFixed(1)
+    : '0.0';
+  const completed = projects.filter(p => p.status === 'completed').length;
+  const pctCompleted = total > 0 ? ((completed / total) * 100).toFixed(1) : '0.0';
+
   return (
     <div>
       <h2>Grant Report</h2>
 
+      {/* Filter form — lab dropdown is built dynamically from DB */}
       <div className="form-card">
         <h3>Filter Projects</h3>
         <form onSubmit={handleApply} className="form-grid">
@@ -71,8 +83,32 @@ function GrantReport() {
         </form>
       </div>
 
-      <p style={{ marginBottom: 10, fontSize: 13 }}>{projects.length} project(s) found</p>
+      {/* Statistics for filtered results */}
+      <div className="form-card">
+        <h3>Statistics ({total} project{total !== 1 ? 's' : ''} found)</h3>
+        <table>
+          <tbody>
+            <tr>
+              <td><strong>Average Budget</strong></td>
+              <td>${Number(avgBudget).toLocaleString()}</td>
+            </tr>
+            <tr>
+              <td><strong>Average Researchers per Project</strong></td>
+              <td>{avgResearchers}</td>
+            </tr>
+            <tr>
+              <td><strong>Completed Projects</strong></td>
+              <td>{completed} / {total} ({pctCompleted}%)</td>
+            </tr>
+            <tr>
+              <td><strong>Ongoing Projects</strong></td>
+              <td>{total - completed}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
+      {/* Matching projects table */}
       <div className="table-wrapper">
         <table>
           <thead>
