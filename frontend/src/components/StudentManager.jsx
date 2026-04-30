@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-const API = '/api';
+const API = '/_/backend/api';
 
 function StudentManager() {
   const [students, setStudents] = useState([]);
