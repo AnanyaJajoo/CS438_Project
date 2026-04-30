@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
 const Lab = require('../models/Lab');
+const Project = require('../models/Project');
 
 router.get('/', async (req, res) => {
   try {
@@ -32,11 +34,25 @@ router.put('/:id', async (req, res) => {
 });
 
 router.delete('/:id', async (req, res) => {
+  // Transaction with snapshot isolation (MongoDB default): deleting a lab and
+  // its associated projects must be atomic — a partial delete would leave orphan
+  // projects referencing a non-existent lab, breaking the stats report.
+  const session = await mongoose.startSession();
   try {
-    await Lab.findByIdAndDelete(req.params.id);
-    res.json({ message: 'Lab deleted' });
+    session.startTransaction();
+    await Project.deleteMany({ lab: req.params.id }, { session });
+    const lab = await Lab.findByIdAndDelete(req.params.id, { session });
+    if (!lab) {
+      await session.abortTransaction();
+      return res.status(404).json({ error: 'Lab not found' });
+    }
+    await session.commitTransaction();
+    res.json({ message: 'Lab and its projects deleted' });
   } catch (err) {
+    await session.abortTransaction();
     res.status(500).json({ error: err.message });
+  } finally {
+    session.endSession();
   }
 });
 

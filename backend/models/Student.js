@@ -7,4 +7,9 @@ const studentSchema = new mongoose.Schema({
   year: { type: Number }
 });
 
+// Supports: student lookup by email (unique constraint + point queries)
+// Supports: filtering/grouping students by department in reports
+studentSchema.index({ email: 1 }, { unique: true });
+studentSchema.index({ department: 1 });
+
 module.exports = mongoose.model('Student', studentSchema);
