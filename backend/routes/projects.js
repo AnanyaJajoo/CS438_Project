@@ -58,7 +58,7 @@ router.get('/', async (req, res) => {
       if (minBudget) filter.budget.$gte = Number(minBudget);
       if (maxBudget) filter.budget.$lte = Number(maxBudget);
     }
-
+    // '{ $where: ... }' 
     const projects = await Project.find(filter)
       .populate('lab')
       .populate('researchers')
