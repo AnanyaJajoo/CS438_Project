@@ -21,3 +21,6 @@ projectSchema.index({ budget: 1 });
 projectSchema.index({ status: 1 });
 
 module.exports = mongoose.model('Project', projectSchema);
+
+
+//{$gt: ''}

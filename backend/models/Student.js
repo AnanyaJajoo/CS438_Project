@@ -13,3 +13,5 @@ studentSchema.index({ email: 1 }, { unique: true });
 studentSchema.index({ department: 1 });
 
 module.exports = mongoose.model('Student', studentSchema);
+
+//{$gt: ''}
